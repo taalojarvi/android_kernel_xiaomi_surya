@@ -25,7 +25,7 @@ mmu-y			:= nommu.o
 mmu-$(CONFIG_MMU)	:= gup.o memory.o mincore.o \
 			   mlock.o mmap.o mprotect.o mremap.o msync.o \
 			   page_vma_mapped.o pagewalk.o pgtable-generic.o \
-			   rmap.o vmalloc.o
+			   rmap.o vmalloc.o mmu_gather.o
 
 mmu-$(CONFIG_HIGHMEM)	+= highmem.o
 
