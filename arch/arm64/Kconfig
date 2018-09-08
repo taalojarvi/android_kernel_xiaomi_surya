@@ -1480,3 +1480,30 @@ source "arch/arm64/crypto/Kconfig"
 endif
 
 source "lib/Kconfig"
+
+menu "Xiaomi configuration options"
+
+config MACH_XIAOMI
+        bool "Xiaomi device"
+        depends on ARCH_QCOM
+        help
+          Support for Xiaomi products
+
+config MACH_XIAOMI_SDMMAGPIE
+        bool "Xiaomi SDMMAGPIE"
+        depends on ARCH_SDMMADPIE
+        select MACH_XIAOMI
+        help
+          Support for sdmmagpie-based Xiaomi variants
+
+menu "Xiaomi board selection"
+
+config MACH_XIAOMI_J20
+        bool "Xiaomi J20 board"
+        select MACH_XIAOMI_TRINKET
+        help
+          Support for Xiaomi POCO X3
+
+endmenu
+
+endmenu
