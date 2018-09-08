@@ -1502,7 +1502,7 @@ config MACH_XIAOMI_J20
         bool "Xiaomi J20 board"
         select MACH_XIAOMI_TRINKET
         help
-          Support for Xiaomi POCO X3
+          Support for Xiaomi POCO X3 (surya)
 
 endmenu
 
