@@ -241,3 +241,9 @@
 		};
 	};
 };
+
+&soc {
+    restart@c264000 {
+        qcom,force-warm-reboot;
+    };
+};
