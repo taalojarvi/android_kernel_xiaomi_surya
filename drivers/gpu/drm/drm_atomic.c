@@ -30,6 +30,7 @@
 #include <drm/drm_atomic.h>
 #include <drm/drm_mode.h>
 #include <drm/drm_print.h>
+#include <linux/devfreq_boost.h>
 #include <linux/pm_qos.h>
 #include <linux/sync_file.h>
 
@@ -2386,6 +2387,11 @@ int drm_mode_atomic_ioctl(struct drm_device *dev, void *data,
 	int ret;
 
 	preempt_disable();
+
+	if (df_boost_within_input(3250)) {
+		devfreq_boost_kick(DEVFREQ_MSM_CPUBW);
+		devfreq_boost_kick(DEVFREQ_MSM_LLCCBW);
+	}
 
 	/* Don't let the current task migrate to another CPU */
 	cpu = raw_smp_processor_id();
