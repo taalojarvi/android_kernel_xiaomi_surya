@@ -1,0 +1,49 @@
+#include "../qcom-base/sdmmagpie-idp.dtsi"
+#include "surya-sdmmagpie-audio.dtsi"
+#include "surya-sdmmagpie-camera.dtsi"
+#include "surya-sdmmagpie-display.dtsi"
+#include "surya-sdmmagpie-fingerprint.dtsi"
+#include "surya-sdmmagpie-haptics.dtsi"
+#include "surya-sdmmagpie-ir.dtsi"
+#include "surya-sdmmagpie-leds.dtsi"
+#include "surya-sdmmagpie-memory.dtsi"
+#include "surya-sdmmagpie-nfc.dtsi"
+#include "surya-sdmmagpie-pinctrl.dtsi"
+#include "surya-sdmmagpie-power.dtsi"
+#include "surya-sdmmagpie-regulator.dtsi"
+#include "surya-sdmmagpie-thermal.dtsi"
+#include "surya-sdmmagpie-touchscreen.dtsi"
+#include "surya-sdmmagpie-usb.dtsi"
+
+&firmware {
+	android {
+		vbmeta {
+			parts = "vbmeta,boot,recovery,system,vendor,dtbo";
+		};
+		fstab {
+			vendor {
+				fsmgr_flags = "wait,avb";
+			};
+		};
+	};
+};
+
+&ufshc_mem {
+	spm-level = <3>;
+	rpm-level = <3>;
+};
+
+&sdhc_2 {
+	cd-gpios = <&tlmm 69 GPIO_ACTIVE_HIGH>;
+};
+
+&soc {
+	/delete-node/ qupv3_se7_i2c;
+	/delete-node/ qupv3_se8_i2c;
+	/delete-node/ qupv3_se7_spi;
+	/delete-node/ qupv3_se8_spi;
+};
+
+&gpu_gx_gdsc {
+	qcom,skip-disable-before-sw-enable;
+};

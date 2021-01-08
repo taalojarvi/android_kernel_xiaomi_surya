@@ -1,0 +1,5 @@
+&qupv3_se2_i2c {
+	nq@28 {
+		qcom,nq-esepwr = <&tlmm 22 0x00>;
+	};
+};

@@ -1,3 +1,10 @@
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+
+dtbo-$(CONFIG_MACH_XIAOMI_J20) += surya-sdmmagpie-overlay.dtbo
+surya-sdmmagpie-overlay.dtbo-base := qcom-base/sdmmagpie.dtb
+
+endif
+
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
 

@@ -1,0 +1,65 @@
+&qupv3_se0_spi_sleep {
+	config {
+		/delete-property/ bias-disable;
+		bias-pull-up;
+	};
+};
+
+&tlmm {
+	msm_gpio_90:msm_gpio_90 {
+		mux {
+			pins="gpio90";
+			function= "gpio";
+		};
+		config {
+			pins= "gpio90";
+			drive-strength = <2>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	msm_gpio_90_output_high:msm_gpio_90_output_high {
+		mux {
+			pins = "gpio90";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio90";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
+		};
+	};
+
+	msm_gpio_89:msm_gpio_89{
+		mux {
+			pins = "gpio89";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio89";
+			drive-strength=<2>;
+			bias-pull-down;
+		};
+	};
+
+	/delete-node/ qupv3_se7_i2c_pins;
+	/delete-node/ qupv3_se7_spi_pins;
+	/delete-node/ qupv3_se8_i2c_pins;
+	/delete-node/ qupv3_se8_spi_pins;
+};
+
+&qupv3_se9_i2c_sleep {
+	config {
+		pins = "gpio46", "gpio47";
+	};
+};
+
+&qupv3_se11_spi_sleep {
+	config {
+		/delete-property/ bias-disable;
+		bias-pull-down;
+		output-low;
+	};
+};
