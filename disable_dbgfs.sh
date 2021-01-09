@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # disable debugfs for user builds
+echo "DebugFS is already disabled from defconfig. Exiting script"
+exit 0
+
 export MAKE_ARGS=$@
 
 if [ ${DISABLE_DEBUGFS} == "true" ]; then
