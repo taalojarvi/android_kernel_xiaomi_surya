@@ -996,6 +996,7 @@ const void * __init of_flat_dt_match_machine(const void *default_match,
 	return best_data;
 }
 
+#ifdef CONFIG_BOOT_INFO
 void __init early_init_dt_check_for_powerup_reason(unsigned long node)
 {
 	unsigned long pu_reason;
@@ -1012,6 +1013,7 @@ void __init early_init_dt_check_for_powerup_reason(unsigned long node)
 
 	pr_debug("Powerup reason %d\n", (int)pu_reason);
 }
+#endif
 
 #ifdef CONFIG_BLK_DEV_INITRD
 #ifndef __early_init_dt_declare_initrd
@@ -1264,7 +1266,10 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
 
 	pr_debug("Command line is: %s\n", (char*)data);
 
+#ifdef CONFIG_BOOT_INFO
 	early_init_dt_check_for_powerup_reason(node);
+#endif
+
 	/* break now */
 	return 1;
 }

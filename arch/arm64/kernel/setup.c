@@ -65,7 +65,7 @@
 #include <asm/system_misc.h>
 #include <asm/bootinfo.h>
 
-#ifdef CONFIG_OF_FLATTREE
+#if defined(CONFIG_OF_FLATTREE) && defined(CONFIG_BOOT_INFO)
 void __init early_init_dt_setup_pureason_arch(unsigned long pu_reason)
 {
 	set_powerup_reason(pu_reason);
