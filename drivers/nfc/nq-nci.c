@@ -924,6 +924,7 @@ err_nfcc_hw_info:
 	return ret;
 }
 
+#if 0
 /* Check for availability of NQ_ NFC controller hardware */
 static int nfcc_hw_check(struct i2c_client *client, struct nqx_dev *nqx_dev)
 {
@@ -1115,6 +1116,7 @@ done:
 
 	return ret;
 }
+#endif
 
 /*
  * Routine to enable clock.
