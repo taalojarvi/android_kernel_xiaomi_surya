@@ -35,7 +35,7 @@ BASE_DIR=$HOME
 KERNEL_DIR=$(pwd)
 ANYKERNEL_DIR=$BASE_DIR/AnyKernel3
 UPLOAD_DIR=$BASE_DIR/Stratosphere-Canaries
-TC_DIR=$BASE_DIR/proton-clang
+TC_DIR=$BASE_DIR/azure-clang
 LOG_DIR=$BASE_DIR/logs
 
 # Need not be edited
