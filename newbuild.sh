@@ -463,7 +463,7 @@ function menu()  {
 		1) echo -e $DIVIDER
 		   echo -e "$cyan        Building "$KERNEL_NAME "Kernel         "
 		   echo -e $DIVIDER
-		   if [ "$PREFS_UPDATEREPO" = "clean" ]; then
+		   if [ "$PREFS_UPDATEREPO" = "true" ]; then
 		   	update_repo
 		   else
 		   	printf "\n$red Skipping Repo Updation\n$cyan"
