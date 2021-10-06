@@ -419,7 +419,7 @@ function update_repo()  {
 	cd $TC_DIR
 	git pull origin
 	cd $ANYKERNEL_DIR
-	git pull https://github.com/osm0sis/AnyKernel3 master
+	git pull https://github.com/osm0sis/AnyKernel3 surya
 	cd $KERNEL_DIR
 }
 
