@@ -426,7 +426,7 @@ function update_repo()  {
 # Open Menuconfig
 function make_menuconfig()  {
 	echo -e " "
-	make menuconfig CC='ccache clang' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O=$OUTPUT
+	make gconfig CC='ccache clang' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O=$OUTPUT
 	# make menuconfig LD=ld.lld O=$OUTPUT
 }
 
