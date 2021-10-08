@@ -19,6 +19,7 @@ nocol='\033[0m'
 green='\e[32m'
 DIVIDER="$blue***********************************************$nocol"
 
+
 # Kernel details
 KERNEL_NAME="Stratosphere"
 VERSION="Kernel"
@@ -62,6 +63,11 @@ export KBUILD_BUILD_HOST=$(hostname)
 export USE_HOST_LEX=yes
 export USE_CCACHE=1
 export CCACHE_EXEC=$(command -v ccache)
+if [ "$KBUILD_BUILD_HOST" = "hangar" ]; then
+		export THREADS=$(expr $(nproc --all) \* 2)
+	else
+		export THREADS=$(nproc --all)
+	fi
 
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -351,8 +357,8 @@ function make_defconfig()  {
 # Make Kernel
 function make_kernel  {
 	echo -e " "
-#	make -j$(nproc --all) LD=ld.lld O=$OUTPUT 
-	make -j$(nproc --all) CC='ccache clang' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O=$OUTPUT 
+#	make -j$THREADS LD=ld.lld O=$OUTPUT 
+	make -j$THREADS CC='ccache clang' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O=$OUTPUT 
 # Check if Image.gz-dtb exists. If not, stop executing.
 	if ! [ -a $KERNEL_IMG ];
  		then
