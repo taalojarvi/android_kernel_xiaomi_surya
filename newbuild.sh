@@ -63,13 +63,12 @@ export KBUILD_BUILD_HOST=$(hostname)
 export USE_HOST_LEX=yes
 export USE_CCACHE=1
 export CCACHE_EXEC=$(command -v ccache)
-if [ "$KBUILD_BUILD_HOST" = "hangar" ]; then
+if [ "$(cat /sys/devices/system/cpu/smt/active)" = "1" ]; then
 		export THREADS=$(expr $(nproc --all) \* 2)
 	else
 		export THREADS=$(nproc --all)
 	fi
-
-
+	
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # !BE CAREFUL EDITING PAST THIS POINT!
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -527,7 +526,7 @@ function menu()  {
 	 	7) echo -e "$red Exiting"
 	 	   clear
 	 	   ;;
-	 	8) artifact_check
+	 	8) make_package
 	 	   ;; 
 	 	   
 	 esac
