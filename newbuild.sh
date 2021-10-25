@@ -42,8 +42,9 @@ LOG_DIR=$BASE_DIR/logs
 # Need not be edited
 RELEASE_NOTES=$UPLOAD_DIR/releasenotes.md
 OUTPUT=$BASE_DIR/output
-KERNEL_IMG=$OUTPUT/arch/arm64/boot/Image.gz-dtb
-KERNEL_DTB=$OUTPUT/arch/arm64/boot/dtbo.img
+KERNEL_IMG=$OUTPUT/arch/arm64/boot/Image.gz
+KERNEL_DTBO=$OUTPUT/arch/arm64/boot/dtbo.img
+KERNEL_DTB=$OUTPUT/arch/arm64/boot/dts/qcom/sdmmagpie.dtb
 
 
 
@@ -373,7 +374,8 @@ function make_package()  {
 	printf "\n"
 	printf "\n$green Packaging Kernel!"
 	cp $KERNEL_IMG $ANYKERNEL_DIR
-	cp $KERNEL_DTB $ANYKERNEL_DIR
+	cp $KERNEL_DTB $ANYKERNEL_DIR/dtb
+	cp $KERNEL_DTBO $ANYKERNEL_DIR
 	cd $ANYKERNEL_DIR
 	zip -r9 UPDATE-AnyKernel2.zip * -x README UPDATE-AnyKernel2.zip zipsigner.jar
 	java -jar zipsigner.jar UPDATE-AnyKernel2.zip UPDATE-AnyKernel2-signed.zip
