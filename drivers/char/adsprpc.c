@@ -3687,9 +3687,9 @@ static int fastrpc_internal_control(struct fastrpc_file *fl,
 					struct fastrpc_ioctl_control *cp)
 {
 	int err = 0;
-	cpumask_t mask;
+	__maybe_unused cpumask_t mask;
 	struct fastrpc_apps *me = &gfa;
-	u32 len = me->silvercores.corecount, i = 0;
+	__maybe_unused u32 len = me->silvercores.corecount, __maybe_unused i = 0;
 
 	VERIFY(err, !IS_ERR_OR_NULL(fl) && !IS_ERR_OR_NULL(fl->apps));
 	if (err)
