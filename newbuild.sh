@@ -414,6 +414,10 @@ function artifact_check()  {
 	find $ANYKERNEL_DIR -name releasenotes.md -delete
 	echo -e "$red Deleting Image.gz-dtb if found $cyan"
 	find $ANYKERNEL_DIR -name Image.gz-dtb -delete
+	echo -e "$red Deleting Image.gz-dtb if found $cyan"
+	find $ANYKERNEL_DIR -name Image.gz -delete
+	echo -e "$red Deleting sdmmagpie.dtb if found $cyan"
+	find $ANYKERNEL_DIR -name sdmmagpie.dtb -delete
 	echo -e "$red Deleting releasenotes.md if found $cyan"
 	find $KERNEL_DIR -name releasenotes.md -delete
 	echo -e "$red Deleting zipped packages if found $cyan"
