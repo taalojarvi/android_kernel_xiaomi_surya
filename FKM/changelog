@@ -1,25 +1,7 @@
-bfab697ca (newbuild.sh: Save console output to logfile Should be easier to keep track of build errors and warnings., 2021-10-29)
-ebd175f7d (newbuild.sh: Cleanup Apply fixes from ShellCheck.net Signed-off-by: taalojarvi <sreedevan05@gmail.com>, 2021-10-27)
-a3575fa08 (newbuild.sh: Add a few more checks to artifact_check, 2021-10-27)
-a8acd05d9 (Revert "f6190bb : mm: Perform PID map reads on cpu7 - Since we have 6:2 cluster type, offloading/performing pid map reads to little clusters causes regressions like sudden increase in jitter/fps drops (under heavyload/multitasking), this behaviour was also observed after offloading nocb threads to little cluster. Let's test if the regression is caused by queueing overheads or lack of cpu capacity.", 2021-10-27)
-eb75e5b32 (defconfig: Updates -Process Reclaim is renabled. -Timer is set to 300Hz -SCHED_AUTOGROUP is reenabled. Signed-off-by: taalojarvi <sreedevan05@gmail.com>, 2021-10-27)
-06985e48a (f6190bb : mm: Perform PID map reads on cpu7 - Since we have 6:2 cluster type, offloading/performing pid map reads to little clusters causes regressions like sudden increase in jitter/fps drops (under heavyload/multitasking), this behaviour was also observed after offloading nocb threads to little cluster. Let's test if the regression is caused by queueing overheads or lack of cpu capacity., 2021-05-14)
-523e05b2e (fs: exec: don't affine hwcompose and surfaceflinger on the same cpu, 2021-05-15)
-834ea84e7 (defconfig: Disable BUG(), 2021-10-26)
-1009e3468 (defconfig: disable a few configs to debloat, 2021-10-26)
-c2a1a550e (drivers: thermals: Mark functions as __maybe_unused, 2021-10-26)
-767ef3172 (drivers: power: Mark functions as __maybe_unused, 2021-10-26)
-81b09ff1c (drivers: net: Mark function as __maybe_unused, 2021-10-26)
-5d166f130 (drivers: char: adsprpc.c: Mark variables as __maybe_unused/, 2021-10-26)
-6b96e3a5a (newbuild.sh: Fix a smol derp, 2021-10-26)
-bfb130555 (newbuild.sh: Correct invocation for ccache with clang, 2021-10-26)
-004aa34aa (defconfig: Disable Appended DTB Image, 2021-10-25)
-998d00e46 (Revert "[PATCH] cpufreq: schedutil: Use exponential frequency selection", 2021-10-25)
-8076ad243 (newbuild.sh: Use unappended dtb, 2021-10-25)
-51a61e03d (defconifg: Switch to a 50Hz timer frequency. Not sure how well this would work. But lets try it out, 2021-10-25)
-ec3bb51c9 (kernel: Kconfig.hz: add interface for setting 50Hz tick rate, 2020-12-24)
-d869a20bf (drivers: Fixup mismerge, 2021-10-25)
-43cdeb09e (Revert "sdmmagpie: Power off DSI PHY during idle PC", 2021-10-25)
-fa255960e (defconfig: Switch back to 100Hz timer frequency. Jitter doesn't reduce all that much and we gain a bit of idle drain. Lets switch back to 100Hz for now Signed-off-by: taalojarvi <sreedevan05@gmail.com>, 2021-10-13)
-39edae99b (mm/vmscan.c: Fixup after mismerge Fix compilation after 24aaee3bcdd2c735261dbe337b1269dddd0e7290 Signed-off-by: taalojarvi <sreedevan05@gmail.com>, 2021-10-13)
-a6cf80247 (defconfig:Regenerate, 2021-10-13)
+Changelog [30th October 2021]
+-Based on QuicksilveR Sources
+-Clang LTO + LLVM LD + Polly + DCE
+-300Hz Timer frequency
+-Debloated unnecessary quirks and features
+-Userspace LMKD
+-Other Optimizations
