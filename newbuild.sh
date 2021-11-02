@@ -595,6 +595,7 @@ printf "\n" | tee -a "$LOG_DIR"/"$LOG"
 load_prefs | tee -a "$LOG_DIR"/"$LOG"
 check_hash | tee -a "$LOG_DIR"/"$LOG"
 menu | tee -a "$LOG_DIR"/"$LOG"
+sed -i 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG_DIR"/"$LOG"
 BUILD_END=$(date +"%s")
 DIFF=$(($BUILD_END - $BUILD_START))
 echo -e "Script execution completed after $((DIFF/60)) minute(s) and $((DIFF % 60)) seconds"
