@@ -102,7 +102,7 @@ function create_prefs() {
 
 # Load Preferences from prop files
 function load_prefs() {
-
+	
 	printf "\n$cyan Loading Preferences $nocol"
 	if [ -f /var/tmp/kscript/kscript.prefs.enabled ]; then
 			if [ "$(cat /var/tmp/kscript/kscript.prefs.enabled)" = "105" ];then
@@ -589,6 +589,9 @@ function debug_menu()  {
 	 esac
 	
 }
+printf "\n" | tee -a "$LOG_DIR"/"$LOG"
+printf "Script started on "$DATE"\n" | tee -a "$LOG_DIR"/"$LOG"
+printf "\n" | tee -a "$LOG_DIR"/"$LOG"
 load_prefs | tee -a "$LOG_DIR"/"$LOG"
 check_hash | tee -a "$LOG_DIR"/"$LOG"
 menu | tee -a "$LOG_DIR"/"$LOG"
