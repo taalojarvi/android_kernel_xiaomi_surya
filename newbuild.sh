@@ -44,7 +44,7 @@ LOG_DIR=$BASE_DIR/logs
 # Need not be edited
 RELEASE_NOTES=$UPLOAD_DIR/releasenotes.md
 OUTPUT=$BASE_DIR/output
-KERNEL_IMG=$OUTPUT/arch/arm64/boot/Image.gz
+KERNEL_IMG=$OUTPUT/arch/arm64/boot/Image
 KERNEL_DTBO=$OUTPUT/arch/arm64/boot/dtbo.img
 KERNEL_DTB=$OUTPUT/arch/arm64/boot/dts/qcom/sdmmagpie.dtb
 
