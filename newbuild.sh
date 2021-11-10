@@ -40,6 +40,7 @@ ANYKERNEL_DIR=$BASE_DIR/AnyKernel3
 UPLOAD_DIR=$BASE_DIR/Stratosphere-Canaries
 TC_DIR=$BASE_DIR/azure-clang
 LOG_DIR=$BASE_DIR/logs
+CONFIG_DIR=$BASE_DIR/configs
 
 # Need not be edited
 RELEASE_NOTES=$UPLOAD_DIR/releasenotes.md
@@ -79,23 +80,23 @@ if [ "$(cat /sys/devices/system/cpu/smt/active)" = "1" ]; then
 # Create default preferences
 function create_prefs() {
 	printf "\n$cyan Writing default preferences! $nocol\n"
-	mkdir /var/tmp/kscript/
-	touch /var/tmp/kscript/kscript.prefs.enabled
-	echo 105 >> /var/tmp/kscript/kscript.prefs.enabled
-	touch /var/tmp/kscript/pref.packaging
-	echo false >> /var/tmp/kscript/pref.packaging
-	touch /var/tmp/kscript/pref.ramdisk
-	echo false >> /var/tmp/kscript/pref.ramdisk
-	touch /var/tmp/kscript/pref.kuser
-	echo "$KBUILD_BUILD_USER" >> /var/tmp/kscript/pref.kuser
-	touch /var/tmp/kscript/pref.hostname
-	echo "$KBUILD_BUILD_HOST" >> /var/tmp/kscript/pref.hostname
-	touch /var/tmp/kscript/pref.buildtype
-	echo clean >> /var/tmp/kscript/pref.buildtype
-	touch /var/tmp/kscript/pref.release
-	echo false >> /var/tmp/kscript/pref.release
-	touch /var/tmp/kscript/pref.updaterepo
-	echo false >> /var/tmp/kscript/pref.updaterepo
+	mkdir "$CONFIG_DIR"/
+	touch "$CONFIG_DIR"/kscript.prefs.enabled
+	echo 105 >> "$CONFIG_DIR"/kscript.prefs.enabled
+	touch "$CONFIG_DIR"/pref.packaging
+	echo false >> "$CONFIG_DIR"/pref.packaging
+	touch "$CONFIG_DIR"/pref.ramdisk
+	echo false >> "$CONFIG_DIR"/pref.ramdisk
+	touch "$CONFIG_DIR"/pref.kuser
+	echo "$KBUILD_BUILD_USER" >> "$CONFIG_DIR"/pref.kuser
+	touch "$CONFIG_DIR"/pref.hostname
+	echo "$KBUILD_BUILD_HOST" >> "$CONFIG_DIR"/pref.hostname
+	touch "$CONFIG_DIR"/pref.buildtype
+	echo clean >> "$CONFIG_DIR"/pref.buildtype
+	touch "$CONFIG_DIR"/pref.release
+	echo false >> "$CONFIG_DIR"/pref.release
+	touch "$CONFIG_DIR"/pref.updaterepo
+	echo false >> "$CONFIG_DIR"/pref.updaterepo
 	
 	load_prefs
 }
@@ -104,20 +105,20 @@ function create_prefs() {
 function load_prefs() {
 	
 	printf "\n$cyan Loading Preferences $nocol"
-	if [ -f /var/tmp/kscript/kscript.prefs.enabled ]; then
-			if [ "$(cat /var/tmp/kscript/kscript.prefs.enabled)" = "105" ];then
+	if [ -f "$CONFIG_DIR"/kscript.prefs.enabled ]; then
+			if [ "$(cat "$CONFIG_DIR"/kscript.prefs.enabled)" = "105" ];then
 				printf "$cyan <$green SUCCESS! $cyan>$nocol\n" 
-				export PREFS_PACKAGING=$(cat /var/tmp/kscript/pref.packaging)
-				export PREFS_RAMDISK=$(cat /var/tmp/kscript/pref.ramdisk)
-				export KBUILD_BUILD_USER=$(cat /var/tmp/kscript/pref.kuser)
-				export KBUILD_BUILD_HOST=$(cat /var/tmp/kscript/pref.hostname)
-				export PREFS_BUILDTYPE=$(cat /var/tmp/kscript/pref.buildtype)
-				export PREFS_RELEASE=$(cat /var/tmp/kscript/pref.release)
-				export PREFS_UPDATEREPO=$(cat /var/tmp/kscript/pref.updaterepo)
+				export PREFS_PACKAGING=$(cat "$CONFIG_DIR"/pref.packaging)
+				export PREFS_RAMDISK=$(cat "$CONFIG_DIR"/pref.ramdisk)
+				export KBUILD_BUILD_USER=$(cat "$CONFIG_DIR"/pref.kuser)
+				export KBUILD_BUILD_HOST=$(cat "$CONFIG_DIR"/pref.hostname)
+				export PREFS_BUILDTYPE=$(cat "$CONFIG_DIR"/pref.buildtype)
+				export PREFS_RELEASE=$(cat "$CONFIG_DIR"/pref.release)
+				export PREFS_UPDATEREPO=$(cat "$CONFIG_DIR"/pref.updaterepo)
 			else 
 				printf "$cyan <$red FAILED! $cyan>$nocol\n" 
 				printf "\n$red Preferences are outdated! Regenerating!"
-				rm -rf /var/tmp/kscript/
+				rm -rf "$CONFIG_DIR"/
 				create_prefs
 			fi
 		
@@ -183,52 +184,52 @@ function toggle_prefs {
 	read toggle
 	case $toggle in
 		1) if [ "$PREFS_PACKAGING" = "true" ]; then
-			sed -i "s/true/false/" /var/tmp/kscript/pref.packaging
-			export PREFS_PACKAGING=$(cat /var/tmp/kscript/pref.packaging)
-			sed -i "s/true/false/" /var/tmp/kscript/pref.release
-			export PREFS_RELEASE=$(cat /var/tmp/kscript/pref.release)
+			sed -i "s/true/false/" "$CONFIG_DIR"/pref.packaging
+			export PREFS_PACKAGING=$(cat "$CONFIG_DIR"/pref.packaging)
+			sed -i "s/true/false/" "$CONFIG_DIR"/pref.release
+			export PREFS_RELEASE=$(cat "$CONFIG_DIR"/pref.release)
 		   else
-		   	sed -i "s/false/true/" /var/tmp/kscript/pref.packaging
-		   	export PREFS_PACKAGING=$(cat /var/tmp/kscript/pref.packaging)
+		   	sed -i "s/false/true/" "$CONFIG_DIR"/pref.packaging
+		   	export PREFS_PACKAGING=$(cat "$CONFIG_DIR"/pref.packaging)
 		   fi
 		   toggle_prefs
 		   ;;
 		2) if [ "$PREFS_RAMDISK" = "true" ]; then
-			sed -i "s/true/false/" /var/tmp/kscript/pref.ramdisk
-			export PREFS_RAMDISK=$(cat /var/tmp/kscript/pref.ramdisk)
+			sed -i "s/true/false/" "$CONFIG_DIR"/pref.ramdisk
+			export PREFS_RAMDISK=$(cat "$CONFIG_DIR"/pref.ramdisk)
 		   else
-		   	sed -i "s/false/true/" /var/tmp/kscript/pref.ramdisk
-		   	export PREFS_RAMDISK=$(cat /var/tmp/kscript/pref.ramdisk)
+		   	sed -i "s/false/true/" "$CONFIG_DIR"/pref.ramdisk
+		   	export PREFS_RAMDISK=$(cat "$CONFIG_DIR"/pref.ramdisk)
 		   fi
 		   toggle_prefs
 		   ;;
 		3) if [ "$PREFS_UPDATEREPO" = "true" ]; then
-			sed -i "s/true/false/" /var/tmp/kscript/pref.updaterepo
-			export PREFS_UPDATEREPO=$(cat /var/tmp/kscript/pref.updaterepo)
+			sed -i "s/true/false/" "$CONFIG_DIR"/pref.updaterepo
+			export PREFS_UPDATEREPO=$(cat "$CONFIG_DIR"/pref.updaterepo)
 		   else
-		   	sed -i "s/false/true/" /var/tmp/kscript/pref.updaterepo
-		   	export PREFS_UPDATEREPO=$(cat /var/tmp/kscript/pref.updaterepo)
+		   	sed -i "s/false/true/" "$CONFIG_DIR"/pref.updaterepo
+		   	export PREFS_UPDATEREPO=$(cat "$CONFIG_DIR"/pref.updaterepo)
 		   fi
 		   toggle_prefs
 		   ;;
 		4) if [ "$PREFS_RELEASE" = "true" ]; then
-			sed -i "s/true/false/" /var/tmp/kscript/pref.release
-			export PREFS_RELEASE=$(cat /var/tmp/kscript/pref.release)
+			sed -i "s/true/false/" "$CONFIG_DIR"/pref.release
+			export PREFS_RELEASE=$(cat "$CONFIG_DIR"/pref.release)
 		   else
-		   	sed -i "s/false/true/" /var/tmp/kscript/pref.release
-		   	sed -i "s/false/true/" /var/tmp/kscript/pref.packaging
-		   	export PREFS_RELEASE=$(cat /var/tmp/kscript/pref.release)
-		   	export PREFS_PACKAGING=$(cat /var/tmp/kscript/pref.packaging)
+		   	sed -i "s/false/true/" "$CONFIG_DIR"/pref.release
+		   	sed -i "s/false/true/" "$CONFIG_DIR"/pref.packaging
+		   	export PREFS_RELEASE=$(cat "$CONFIG_DIR"/pref.release)
+		   	export PREFS_PACKAGING=$(cat "$CONFIG_DIR"/pref.packaging)
 		   	
 		   fi
 		   toggle_prefs
 		   ;;
 		5) if [ "$PREFS_BUILDTYPE" = "clean" ]; then
-			sed -i "s/clean/dirty/" /var/tmp/kscript/pref.buildtype
-			export PREFS_BUILDTYPE=$(cat /var/tmp/kscript/pref.buildtype)
+			sed -i "s/clean/dirty/" "$CONFIG_DIR"/pref.buildtype
+			export PREFS_BUILDTYPE=$(cat "$CONFIG_DIR"/pref.buildtype)
 		   else
-		   	sed -i "s/dirty/clean/" /var/tmp/kscript/pref.buildtype
-		   	export PREFS_BUILDTYPE=$(cat /var/tmp/kscript/pref.buildtype)
+		   	sed -i "s/dirty/clean/" "$CONFIG_DIR"/pref.buildtype
+		   	export PREFS_BUILDTYPE=$(cat "$CONFIG_DIR"/pref.buildtype)
 		   fi
 		   toggle_prefs
 		   ;;
@@ -240,8 +241,8 @@ function toggle_prefs {
 		   	printf "\n$red Username cannot be empty!\n"
 		   	toggle_prefs
 		   else
-		   	sed -i "s/$KBUILD_BUILD_USER/$newuser/" /var/tmp/kscript/pref.kuser
-		   	export KBUILD_BUILD_USER=$(cat /var/tmp/kscript/pref.kuser)
+		   	sed -i "s/$KBUILD_BUILD_USER/$newuser/" "$CONFIG_DIR"/pref.kuser
+		   	export KBUILD_BUILD_USER=$(cat "$CONFIG_DIR"/pref.kuser)
 		   	toggle_prefs 
 		   fi
 		   ;;
@@ -253,8 +254,8 @@ function toggle_prefs {
 		   	printf "\n$red Hostname cannot be empty!\n"
 		   	toggle_prefs
 		   else
-		   	sed -i "s/$KBUILD_BUILD_HOST/$newhost/" /var/tmp/kscript/pref.hostname
-		   	export KBUILD_BUILD_HOST=$(cat /var/tmp/kscript/pref.hostname)
+		   	sed -i "s/$KBUILD_BUILD_HOST/$newhost/" "$CONFIG_DIR"/pref.hostname
+		   	export KBUILD_BUILD_HOST=$(cat "$CONFIG_DIR"/pref.hostname)
 		   	toggle_prefs 
 		   fi
 		   ;;
@@ -267,15 +268,15 @@ function toggle_prefs {
 
 # Check if script is unmodified since last run to reduce Disk I/O with preflight checks
 function check_hash() {
-	if [ ! -f /tmp/kscript.hash ]; then
+	if [ ! -f "$CONFIG_DIR"/kscript.hash ]; then
 		printf "\n$cyan Checksum file not found. Creating!$nocol\n"
-		touch /tmp/kscript.hash
+		touch "$CONFIG_DIR"/kscript.hash
 	else
 		printf "$cyan Previous checksum found!$nocol\n"
 	fi
 	printf "$cyan Checking if script has been modified "
 	export CHECKSUM_CURRENT=$(md5sum $(pwd)/"$0")
-	export CHECKSUM_FILE=$(cat /tmp/kscript.hash)
+	export CHECKSUM_FILE=$(cat "$CONFIG_DIR"/kscript.hash)
 	if [ "$CHECKSUM_CURRENT" = "$CHECKSUM_FILE" ]; then
 		printf "$cyan <$green SUCCESS! $cyan>$nocol\n" 
 	else
@@ -329,9 +330,9 @@ function preflight() {
 	printf "\n"
 	
 	printf "$cyan Generating Hash for Buildscript $nocol\n"
-	rm /tmp/kscript.hash
-	touch /tmp/kscript.hash
-	md5sum $(pwd)/"$0" >> /tmp/kscript.hash
+	rm "$CONFIG_DIR"/kscript.hash
+	touch "$CONFIG_DIR"/kscript.hash
+	md5sum $(pwd)/"$0" >> "$CONFIG_DIR"/kscript.hash
 }
 # Create Release Notes
 function make_releasenotes()  {
@@ -376,7 +377,7 @@ function make_package()  {
 	printf "\n"
 	printf "\n$green Packaging Kernel!"
 	cp "$KERNEL_IMG" "$ANYKERNEL_DIR"
-	cp "$KERNEL_DTB" "$ANYKERNEL_DIR"/dtb
+	cp "$KERNEL_DTB" "$ANYKERNEL_DIR"
 	cp "$KERNEL_DTBO" "$ANYKERNEL_DIR"
 	cd "$ANYKERNEL_DIR"
 	zip -r9 UPDATE-AnyKernel2.zip * -x README UPDATE-AnyKernel2.zip zipsigner.jar
@@ -430,9 +431,9 @@ function artifact_check()  {
 function update_repo()  {
 	echo -e " "
 	cd "$TC_DIR"
-	git pull origin
+	git pull origin --ff-only
 	cd "$ANYKERNEL_DIR"
-	git pull https://github.com/osm0sis/AnyKernel3 master
+	git pull https://github.com/osm0sis/AnyKernel3 master --ff-only
 	cd "$KERNEL_DIR"
 }
 
@@ -599,3 +600,4 @@ sed -i 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG_DIR"/"$LOG"
 BUILD_END=$(date +"%s")
 DIFF=$(($BUILD_END - $BUILD_START))
 echo -e "Script execution completed after $((DIFF/60)) minute(s) and $((DIFF % 60)) seconds"
+
