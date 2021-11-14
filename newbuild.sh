@@ -97,7 +97,6 @@ function create_prefs() {
 	echo false >> "$CONFIG_DIR"/pref.release
 	touch "$CONFIG_DIR"/pref.updaterepo
 	echo false >> "$CONFIG_DIR"/pref.updaterepo
-	
 	load_prefs
 }
 
@@ -136,28 +135,28 @@ function toggle_prefs {
 	printf "\n"
 	
 	printf "\n$yellow 1. Create Package After Compilation "
-	if [ "$PREFS_PACKAGING" = "true" ]; then
+	if [ "$PREFS_PACKAGING" = true ]; then
 		printf "$cyan <$green ENABLED $cyan>$nocol\n" 
 	else
 		printf "$cyan <$red DISABLED $cyan>$nocol\n" 
 	fi
 	
 	printf "\n$yellow 2. Use RAMDISK to speedup compilation "
-	if [ "$PREFS_RAMDISK" = "true" ]; then
+	if [ "$PREFS_RAMDISK" = true ]; then
 		printf "$cyan <$green ENABLED $cyan>$nocol\n" 
 	else
 		printf "$cyan <$red DISABLED $cyan>$nocol\n" 
 	fi
 	
 	printf "\n$yellow 3. Update AK and TC Repos before Compilation"
-	if [ "$PREFS_UPDATEREPO" = "true" ]; then
+	if [ "$PREFS_UPDATEREPO" = true ]; then
 		printf "$cyan <$green ENABLED $cyan>$nocol\n" 
 	else
 		printf "$cyan <$red DISABLED $cyan>$nocol\n" 
 	fi
 	
 	printf "\n$yellow 4. Release Package to Github "
-	if [ "$PREFS_RELEASE" = "true" ]; then
+	if [ "$PREFS_RELEASE" = true ]; then
 		printf "$cyan <$green ENABLED $cyan>$nocol\n" 
 	else
 		printf "$cyan <$red DISABLED $cyan>$nocol\n" 
@@ -166,7 +165,7 @@ function toggle_prefs {
 	
 	
 	printf "\n$yellow 5. Toggle Build Type "
-	if [ "$PREFS_BUILDTYPE" = "clean" ]; then
+	if [ "$PREFS_BUILDTYPE" = clean ]; then
 		printf "$cyan <$green CLEAN $cyan>$nocol\n" 
 	else
 		printf "$cyan <$red DIRTY $cyan>$nocol\n" 
@@ -183,7 +182,7 @@ function toggle_prefs {
 	printf "\n$yellow Awaiting User Input: $red"
 	read toggle
 	case $toggle in
-		1) if [ "$PREFS_PACKAGING" = "true" ]; then
+		1) if [ $PREFS_PACKAGING = true ]; then
 			sed -i "s/true/false/" "$CONFIG_DIR"/pref.packaging
 			export PREFS_PACKAGING=$(cat "$CONFIG_DIR"/pref.packaging)
 			sed -i "s/true/false/" "$CONFIG_DIR"/pref.release
@@ -194,7 +193,7 @@ function toggle_prefs {
 		   fi
 		   toggle_prefs
 		   ;;
-		2) if [ "$PREFS_RAMDISK" = "true" ]; then
+		2) if [ $PREFS_RAMDISK = true ]; then
 			sed -i "s/true/false/" "$CONFIG_DIR"/pref.ramdisk
 			export PREFS_RAMDISK=$(cat "$CONFIG_DIR"/pref.ramdisk)
 		   else
@@ -203,7 +202,7 @@ function toggle_prefs {
 		   fi
 		   toggle_prefs
 		   ;;
-		3) if [ "$PREFS_UPDATEREPO" = "true" ]; then
+		3) if [ $PREFS_UPDATEREPO = true ]; then
 			sed -i "s/true/false/" "$CONFIG_DIR"/pref.updaterepo
 			export PREFS_UPDATEREPO=$(cat "$CONFIG_DIR"/pref.updaterepo)
 		   else
@@ -212,7 +211,7 @@ function toggle_prefs {
 		   fi
 		   toggle_prefs
 		   ;;
-		4) if [ "$PREFS_RELEASE" = "true" ]; then
+		4) if [ $PREFS_RELEASE = true ]; then
 			sed -i "s/true/false/" "$CONFIG_DIR"/pref.release
 			export PREFS_RELEASE=$(cat "$CONFIG_DIR"/pref.release)
 		   else
@@ -224,7 +223,7 @@ function toggle_prefs {
 		   fi
 		   toggle_prefs
 		   ;;
-		5) if [ "$PREFS_BUILDTYPE" = "clean" ]; then
+		5) if [ $PREFS_BUILDTYPE = clean ]; then
 			sed -i "s/clean/dirty/" "$CONFIG_DIR"/pref.buildtype
 			export PREFS_BUILDTYPE=$(cat "$CONFIG_DIR"/pref.buildtype)
 		   else
@@ -377,7 +376,7 @@ function make_package()  {
 	printf "\n"
 	printf "\n$green Packaging Kernel!"
 	cp "$KERNEL_IMG" "$ANYKERNEL_DIR"
-	cp "$KERNEL_DTB" "$ANYKERNEL_DIR"
+	cp "$KERNEL_DTB" "$ANYKERNEL_DIR"/dtb
 	cp "$KERNEL_DTBO" "$ANYKERNEL_DIR"
 	cd "$ANYKERNEL_DIR"
 	zip -r9 UPDATE-AnyKernel2.zip * -x README UPDATE-AnyKernel2.zip zipsigner.jar
@@ -421,6 +420,7 @@ function artifact_check()  {
 	find "$ANYKERNEL_DIR" -name Image.gz -delete 
 	echo -e "$red Deleting sdmmagpie.dtb if found $cyan" 
 	find "$ANYKERNEL_DIR" -name sdmmagpie.dtb -delete 
+	find "$ANYKERNEL_DIR" -name dtb -delete 
 	echo -e "$red Deleting releasenotes.md if found $cyan" 
 	find "$KERNEL_DIR" -name releasenotes.md -delete 
 	echo -e "$red Deleting zipped packages if found $cyan" 
@@ -593,8 +593,8 @@ function debug_menu()  {
 printf "\n" | tee -a "$LOG_DIR"/"$LOG"
 printf "Script started on "$DATE"\n" | tee -a "$LOG_DIR"/"$LOG"
 printf "\n" | tee -a "$LOG_DIR"/"$LOG"
-load_prefs | tee -a "$LOG_DIR"/"$LOG"
-check_hash | tee -a "$LOG_DIR"/"$LOG"
+load_prefs
+check_hash
 menu | tee -a "$LOG_DIR"/"$LOG"
 sed -i 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG_DIR"/"$LOG"
 BUILD_END=$(date +"%s")
