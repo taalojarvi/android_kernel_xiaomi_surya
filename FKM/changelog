@@ -1,7 +1,9 @@
-Changelog [30th October 2021]
--Based on QuicksilveR Sources
--Clang LTO + LLVM LD + Polly + DCE
--300Hz Timer frequency
--Debloated unnecessary quirks and features
--Userspace LMKD
--Other Optimizations
+* Changelog [15th November 2021]
+* Upstreamed Latest QuicksilveR Sources
+* Removed CAF Input Boosting
+* Support for Wireguard [20210606]
+* Clang 14 + Full LTO + LLD 14 + Polly + DCE
+* 100Hz Timer frequency
+* Removed unnecessary debugging and logging
+* Userspace LMKD
+* Other misc optimizations
