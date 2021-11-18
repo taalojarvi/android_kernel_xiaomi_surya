@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # 
 # Odds and Ends for Android Kernel Building 
 # Copyright 2021 Karthik Sreedevan <taalojarvi@github.com>
@@ -352,15 +352,15 @@ function make_releasenotes()  {
 # Make defconfig
 function make_defconfig()  {
 	echo -e " "
-#	make $DEFCONFIG LD=aarch64-elf-ld.lld O=$OUTPUT
-	make $DEFCONFIG CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
+#	make $DEFCONFIG LD=aarch64-elf-ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make $DEFCONFIG CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 }
 
 # Make Kernel
 function make_kernel  {
 	echo -e " "
-#	make -j$THREADS LD=ld.lld O=$OUTPUT 
-	make -j"$THREADS" CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 
+#	make -j$THREADS LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make -j"$THREADS" CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 # Check if Image.gz-dtb exists. If not, stop executing.
 	if ! [ -a "$KERNEL_IMG" ];
  		then
@@ -401,10 +401,10 @@ function make_cleanup()  {
 	echo -e "$cyan    Cleaning out build artifacts. Please wait       "
 	echo -e "$DIVIDER"
 	echo -e " "
-#	make clean LD=ld.lld O=$OUTPUT
-#	make mrproper LD=ld.lld O=$OUTPUT
-	make clean CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
-	make mrproper CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
+#	make clean LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+#	make mrproper LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make clean CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make mrproper CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 }
 
 # Check for Script Artifacts from previous builds
@@ -440,8 +440,8 @@ function update_repo()  {
 # Open Menuconfig
 function make_menuconfig()  {
 	echo -e " "
-	make gconfig CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
-	# make menuconfig LD=ld.lld O=$OUTPUT
+	make gconfig CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	# make menuconfig LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 }
 
 # Clear CCACHE
@@ -453,7 +453,7 @@ function clear_ccache  {
 # Regenerate Defconfig
 function regen_defconfig()  {
 	echo -e " "
-	cp "$OUTPUT"/.config "$KERNEL_DIR"/arch/arm64/configs/"$DEFCONFIG"
+	cp "$OUTPUT"/.config "$KERNEL_DIR"/arch/arm64/configs/"$DEFCONFIG" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 	# git commit arch/arm64/configs/$DEFCONFIG
 }
 	
@@ -595,7 +595,7 @@ printf "Script started on "$DATE"\n" | tee -a "$LOG_DIR"/"$LOG"
 printf "\n" | tee -a "$LOG_DIR"/"$LOG"
 load_prefs
 check_hash
-menu | tee -a "$LOG_DIR"/"$LOG"
+menu
 sed -i 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG_DIR"/"$LOG"
 BUILD_END=$(date +"%s")
 DIFF=$(($BUILD_END - $BUILD_START))
