@@ -1,9 +1,7 @@
-* Changelog [15th November 2021]
-* Upstreamed Latest QuicksilveR Sources
-* Removed CAF Input Boosting
-* Support for Wireguard [20210606]
-* Clang 14 + Full LTO + LLD 14 + Polly + DCE
-* 100Hz Timer frequency
-* Removed unnecessary debugging and logging
-* Userspace LMKD
-* Other misc optimizations
+* Changelog [29th November 2021]
+* Upstreamed latest QuickSilveR sources
+* Switched to PELT for better battery backup
+* Introduced vibration control
+* Reduced PSI overheads
+* Reduced logspam
+* More optimizations
