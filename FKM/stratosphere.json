@@ -2,10 +2,10 @@
   "kernel": {
     "name": "Stratosphere Kernel",
     "version": "3",
-    "link": "https://github.com/Stratosphere-Kernel/android_kernel_xiaomi_surya/releases/download/Milestone-3/Stratosphere-Kernel-29-11-2021-09-23.zip",
+    "link": "https://github.com/Stratosphere-Kernel/android_kernel_xiaomi_surya/releases/download/Milestone-3/Stratosphere-Kernel-29-11-2021-02-40.zip",
     "changelog_url": "https://raw.githubusercontent.com/Stratosphere-Kernel/android_kernel_xiaomi_surya/staging/LA.UM.9.x/FKM/changelog",
     "date": "2021-11-29",
-    "sha1": "991df97627eabbf64e8c2891725fe60780ad04a4"
+    "sha1": "fe7084c23d0529b32fb43a7bb8d441c6cb50a5ca"
   },
   "support": {
     "link": "https://t.me/StratosphereKernelHangar"
