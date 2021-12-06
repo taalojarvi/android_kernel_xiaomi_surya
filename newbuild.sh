@@ -433,7 +433,8 @@ function update_repo()  {
 	cd "$TC_DIR"
 	git pull origin --ff-only
 	cd "$ANYKERNEL_DIR"
-	git pull https://github.com/osm0sis/AnyKernel3 master --ff-only
+	git pull https://github.com/osm0sis/AnyKernel3 master
+	git push
 	cd "$KERNEL_DIR"
 }
 
