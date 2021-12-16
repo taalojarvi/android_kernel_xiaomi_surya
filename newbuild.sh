@@ -9,6 +9,7 @@
 # Portions Copyight <YEAR> <NAME> <EMAIL>
 #
 BUILD_START=$(date +"%s")
+export TZ=Etc/UTC
 
 # Colours and Graphics
 blue='\033[0;34m'
