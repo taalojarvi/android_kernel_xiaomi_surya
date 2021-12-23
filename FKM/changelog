@@ -1,7 +1,13 @@
-* Changelog [29th November 2021]
-* Upstreamed latest QuickSilveR sources
-* Switched to PELT for better battery backup
-* Introduced vibration control
-* Reduced PSI overheads
-* Reduced logspam
-* More optimizations
+* Changelog [23rd December 2021]
+* Happy Holidays everyone!
+* Upstreamed latest QuickSilveR source
+* USB-OTG Fixed
+* Upstreamed Wireguard to 202111208
+* Now compiled with LLVM-Polly optimization
+* Added support for NTFS_RW
+* Added support for exFAT-arter97
+* Added experimental support for DriveDroid
+* Removed support for Nintendo Joycons
+* Fixes for better battery backup
+* Addressed a few logspam issues.
+* Other misc optimizations
