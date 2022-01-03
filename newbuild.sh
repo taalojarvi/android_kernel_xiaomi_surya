@@ -8,8 +8,8 @@
 # If you modify this script to suit  your needs, add your authorship info in the following format
 # Portions Copyight <YEAR> <NAME> <EMAIL>
 #
-BUILD_START=$(date +"%s")
 export TZ=Etc/UTC
+BUILD_START=$(date +"%s")
 
 # Colours and Graphics
 blue='\033[0;34m'
