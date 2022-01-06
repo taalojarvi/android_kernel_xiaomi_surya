@@ -1,15 +1,17 @@
 #!/bin/bash
 # 
 # Odds and Ends for Android Kernel Building 
-# Copyright 2021 Karthik Sreedevan <taalojarvi@github.com>
+# Copyright 2022 Karthik Sreedevan <taalojarvi@github.com>
 # Portions Copyright Aayush Gupta <TheImpulson@github.com>
 # Based on @TheImpulson's FireKernel Buildscript with a few additions and fixes of my own
 #
 # If you modify this script to suit  your needs, add your authorship info in the following format
 # Portions Copyight <YEAR> <NAME> <EMAIL>
 #
+export SECONDS=0
 export TZ=Etc/UTC
 BUILD_START=$(date +"%s")
+
 
 # Colours and Graphics
 blue='\033[0;34m'
@@ -338,14 +340,11 @@ function preflight() {
 function make_releasenotes()  {
 	touch releasenotes.md
 	echo -e "This is an Early Access Build of "$KERNEL_NAME" Kernel. Flash at your own risk!" >> releasenotes.md
-	echo -e >> releasenotes.md
-	echo -e "Build Information" >> releasenotes.md
-	echo -e >> releasenotes.md
-	COMPILE_END=$(date +"%s")
-	CDIFF=$(($COMPILE_END - $COMPILE_START))
-	echo -e "Build completed after $((CDIFF/60)) minute(s) and $((CDIFF % 60)) seconds" >>releasenotes.md
-	echo -e "Builder: ""$KBUILD_BUILD_USER" >> releasenotes.md
-	echo -e "Machine: ""$KBUILD_BUILD_HOST" >> releasenotes.md
+	COMPILE_END=$(("$SECONDS"%3600/60))
+#	CDIFF=$(($COMPILE_END - $COMPILE_START))
+#	export COMPILE_END=$( "$(SECONDS)" % 3600)/60
+#	printf '%dh:%dm:%ds\n' $((SECONDS/3600)) $((SECONDS%3600/60)) $((SECONDS%60)) >> releasenotes.md
+ 	echo -e "Build completed after ""$COMPILE_END"" minutes on "$KBUILD_BUILD_HOST"" >>releasenotes.md
 	echo -e "Build Date: ""$DATE" >> releasenotes.md
 	echo -e >> releasenotes.md
 	echo -e "Last 5 Commits before Build:-" >> releasenotes.md
@@ -564,6 +563,7 @@ function debug_menu()  {
 	echo -e "10: make_kernel"
 	echo -e "11: release"
 	echo -e "12: menu"
+	echo -e "13: make_releasenotes"
 	echo -e ""
 	echo -e "Awaiting User Input: $yellow"
 	read dchoice
@@ -593,6 +593,7 @@ function debug_menu()  {
 	       	   ;;
 	       12) menu
 	       	   ;;
+	       13) make_releasenotes
 	 esac
 	
 }
