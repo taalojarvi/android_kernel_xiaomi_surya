@@ -31,6 +31,7 @@ DEFCONFIG=vendor/surya-perf_defconfig
 # Need not edit these.
 DATE=$(date +"%d-%m-%Y-%I-%M")
 SHORTDATE=$(date +"%d-%m-%Y")
+TIMESTAMP=$(date)
 LOG="Build"-$SHORTDATE
 FINAL_ZIP=$KERNEL_NAME-$VERSION-$DATE.zip
 RELEASE_TAG=earlyaccess-$DATE
@@ -339,13 +340,18 @@ function preflight() {
 # Create Release Notes
 function make_releasenotes()  {
 	touch releasenotes.md
+	echo -e "#earlyaccess" > releasenotes.md
+	echo -e >> releasenotes.md
 	echo -e "This is an Early Access Build of "$KERNEL_NAME" Kernel. Flash at your own risk!" >> releasenotes.md
 	COMPILE_END=$(("$SECONDS"%3600/60))
 #	CDIFF=$(($COMPILE_END - $COMPILE_START))
 #	export COMPILE_END=$( "$(SECONDS)" % 3600)/60
 #	printf '%dh:%dm:%ds\n' $((SECONDS/3600)) $((SECONDS%3600/60)) $((SECONDS%60)) >> releasenotes.md
- 	echo -e "Build completed after ""$COMPILE_END"" minutes on "$KBUILD_BUILD_HOST"" >>releasenotes.md
-	echo -e "Build Date: ""$DATE" >> releasenotes.md
+	BUILD_END=$(date +"%s")
+	DIFF=$(($BUILD_END - $BUILD_START))
+	echo -e "Build completed after $((DIFF/60)) minute(s)" >> releasenotes.md
+# 	echo -e "Build completed after ""$COMPILE_END"" minutes on "$KBUILD_BUILD_HOST"" >>releasenotes.md
+	echo -e "Build Date: ""$TIMESTAMP" >> releasenotes.md
 	echo -e >> releasenotes.md
 	echo -e "Last 5 Commits before Build:-" >> releasenotes.md
 	git log --decorate=auto --pretty=format:'%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset %n' --graph -n 10 >> releasenotes.md
@@ -356,7 +362,7 @@ function make_releasenotes()  {
 function make_defconfig()  {
 	echo -e " "
 #	make $DEFCONFIG LD=aarch64-elf-ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
-	make $DEFCONFIG CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make $DEFCONFIG CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
 }
 
 # Make Kernel
@@ -371,7 +377,7 @@ function make_kernel  {
     		echo -e "$red An error has occured during compilation. Please check your code. $cyan"
     		exit 1
     	else
-    		printf "\n$red Kernel built succesfully! \n$cyan"
+    		printf "\n$green Kernel built succesfully! \n$cyan"
   	fi 
 }
 
@@ -407,8 +413,8 @@ function make_cleanup()  {
 	echo -e " "
 #	make clean LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
 #	make mrproper LD=ld.lld O=$OUTPUT 2>&1 | tee -a "$LOG_DIR"/"$LOG"
-	make clean CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
-	make mrproper CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	make clean CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT" 
+	make mrproper CC='ccache clang -Qunused-arguments -fcolor-diagnostics' LD=ld.lld AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip O="$OUTPUT"
 }
 
 # Check for Script Artifacts from previous builds
@@ -429,6 +435,8 @@ function artifact_check()  {
 	find "$KERNEL_DIR" -name releasenotes.md -delete 
 	echo -e "$red Deleting zipped packages if found $cyan" 
 	find "$ANYKERNEL_DIR" -name \*.zip -delete 
+	echo -e "$red Deleting zipped packages if found $cyan" 
+	find "$UPLOAD_DIR" -name \*.zip -delete 
 }
 
 # Update Toolchain Repository
@@ -458,7 +466,7 @@ function clear_ccache  {
 # Regenerate Defconfig
 function regen_defconfig()  {
 	echo -e " "
-	cp "$OUTPUT"/.config "$KERNEL_DIR"/arch/arm64/configs/"$DEFCONFIG" 2>&1 | tee -a "$LOG_DIR"/"$LOG"
+	cp "$OUTPUT"/.config "$KERNEL_DIR"/arch/arm64/configs/"$DEFCONFIG"
 	# git commit arch/arm64/configs/$DEFCONFIG
 }
 	
