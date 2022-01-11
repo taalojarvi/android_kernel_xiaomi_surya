@@ -115,7 +115,6 @@ __read_mostly unsigned int sysctl_sched_cpu_high_irqload = TICK_NSEC;
 unsigned int sysctl_sched_walt_rotate_big_tasks;
 unsigned int walt_rotation_enabled;
 
-__read_mostly unsigned int sysctl_sched_asym_cap_sibling_freq_match_pct = 100;
 __read_mostly unsigned int sched_ravg_hist_size = 5;
 
 static __read_mostly unsigned int sched_io_is_busy = 1;
@@ -2270,7 +2269,6 @@ struct sched_cluster *sched_cluster[NR_CPUS];
 static int num_sched_clusters;
 
 struct list_head cluster_head;
-cpumask_t asym_cap_sibling_cpus = CPU_MASK_NONE;
 
 static struct sched_cluster init_cluster = {
 	.list			=	LIST_HEAD_INIT(init_cluster.list),
@@ -2480,7 +2478,6 @@ void update_cluster_topology(void)
 {
 	struct cpumask cpus = *cpu_possible_mask;
 	const struct cpumask *cluster_cpus;
-	struct sched_cluster *cluster;
 	struct list_head new_head;
 	int i;
 
@@ -2505,15 +2502,6 @@ void update_cluster_topology(void)
 	 */
 	move_list(&cluster_head, &new_head, false);
 	update_all_clusters_stats();
-
-	for_each_sched_cluster(cluster) {
-		if (cpumask_weight(&cluster->cpus) == 1)
-			cpumask_or(&asym_cap_sibling_cpus,
-				   &asym_cap_sibling_cpus, &cluster->cpus);
-	}
-
-	if (cpumask_weight(&asym_cap_sibling_cpus) == 1)
-		cpumask_clear(&asym_cap_sibling_cpus);
 }
 
 static unsigned long cpu_max_table_freq[NR_CPUS];
@@ -3359,7 +3347,7 @@ void walt_irq_work(struct irq_work *irq_work)
 	struct rq *rq;
 	int cpu;
 	u64 wc;
-	bool is_migration = false, is_asym_migration = false;
+	bool is_migration = false
 	u64 total_grp_load = 0, min_cluster_grp_load = 0;
 	int level = 0;
 	unsigned long flags;
@@ -3390,11 +3378,6 @@ void walt_irq_work(struct irq_work *irq_work)
 						TASK_UPDATE, wc, 0);
 				account_load_subtractions(rq);
 				aggr_grp_load += rq->grp_time.prev_runnable_sum;
-			}
-			if (is_migration && rq->notif_pending &&
-			    cpumask_test_cpu(cpu, &asym_cap_sibling_cpus)) {
-				is_asym_migration = true;
-				rq->notif_pending = false;
 			}
 		}
 
@@ -3441,10 +3424,6 @@ void walt_irq_work(struct irq_work *irq_work)
 					rq->notif_pending = false;
 				}
 			}
-
-			if (is_asym_migration && cpumask_test_cpu(cpu,
-							&asym_cap_sibling_cpus))
-				flag |= SCHED_CPUFREQ_INTERCLUSTER_MIG;
 
 			if (i == num_cpus)
 				cpufreq_update_util(cpu_rq(cpu), flag);

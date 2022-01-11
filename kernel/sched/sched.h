@@ -108,7 +108,6 @@ struct sched_cluster {
 	bool freq_init_done;
 	u64 aggr_grp_load;
 };
-
 #endif /* CONFIG_SCHED_WALT */
 
 /* task_struct::on_rq states: */
@@ -2582,6 +2581,12 @@ extern int update_preferred_cluster(struct related_thread_group *grp,
 extern void set_preferred_cluster(struct related_thread_group *grp);
 extern void add_new_task_to_grp(struct task_struct *new);
 
+static inline int asym_cap_siblings(int cpu1, int cpu2)
+{
+	return (cpumask_test_cpu(cpu1, &asym_cap_sibling_cpus) &&
+		cpumask_test_cpu(cpu2, &asym_cap_sibling_cpus));
+}
+
 static inline int cpu_max_possible_capacity(int cpu)
 {
 	return cpu_rq(cpu)->cluster->max_possible_capacity;
@@ -2649,9 +2654,6 @@ static inline int same_freq_domain(int src_cpu, int dst_cpu)
 	struct rq *rq = cpu_rq(src_cpu);
 
 	if (src_cpu == dst_cpu)
-		return 1;
-
-	if (asym_cap_siblings(src_cpu, dst_cpu))
 		return 1;
 
 	return cpumask_test_cpu(dst_cpu, &rq->freq_domain_cpumask);
@@ -2836,7 +2838,6 @@ static inline bool is_min_capacity_cpu(int cpu)
 	return true;
 #endif
 }
-
 
 static inline void set_preferred_cluster(struct related_thread_group *grp) { }
 

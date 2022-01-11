@@ -501,13 +501,13 @@ function menu()  {
 		   	printf "\n$red Skipping Cleanup$cyan"
 		   fi
 		   artifact_check
-		   if [ "$PREFS_RELEASE" = "true" ]; then
+		   make_defconfig
+	 	   make_kernel
+	 	   if [ "$PREFS_RELEASE" = "true" ]; then
 		   	make_releasenotes 
 		   else
 		   	printf "\n$red Skipping Changelog Generation$cyan"
-		   fi
-		   make_defconfig
-	 	   make_kernel 
+		   fi 
 	 	   if [ "$PREFS_PACKAGING" = "true" ]; then
 		   	make_package
 		   else

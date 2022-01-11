@@ -194,8 +194,9 @@ unsigned int sched_capacity_margin_down[NR_CPUS] = {
 unsigned int sysctl_sched_min_task_util_for_boost = 51;
 /* 0.68ms default for 20ms window size scaled to 1024 */
 unsigned int sysctl_sched_min_task_util_for_colocation = 35;
-#endif
 __read_mostly unsigned int sysctl_sched_prefer_spread;
+unsigned int sched_task_filter_util = 35;
+#endif
 static unsigned int __maybe_unused sched_small_task_threshold = 102;
 __read_mostly unsigned int sysctl_sched_force_lb_enable = 1;
 
@@ -7569,17 +7570,6 @@ struct find_best_target_env {
 	int start_cpu;
 };
 
-static inline bool prefer_spread_on_idle(int cpu)
-{
-	if (likely(!sysctl_sched_prefer_spread))
-		return false;
-
-	if (is_min_capacity_cpu(cpu))
-		return sysctl_sched_prefer_spread >= 1;
-
-	return sysctl_sched_prefer_spread > 1;
-}
-
 static inline void adjust_cpus_for_packing(struct task_struct *p,
 			int *target_cpu, int *best_idle_cpu,
 			int shallowest_idle_cstate,
@@ -7591,11 +7581,8 @@ static inline void adjust_cpus_for_packing(struct task_struct *p,
 	if (*best_idle_cpu == -1 || *target_cpu == -1)
 		return;
 
-	if (prefer_spread_on_idle(*best_idle_cpu))
-		fbt_env->need_idle |= 2;
-
-	if (fbt_env->need_idle || task_placement_boost_enabled(p) || boosted ||
-		shallowest_idle_cstate <= 0) {
+	if (task_placement_boost_enabled(p) || fbt_env->need_idle || boosted ||
+			shallowest_idle_cstate <= 0) {
 		*target_cpu = -1;
 		return;
 	}
@@ -8336,7 +8323,7 @@ static int find_energy_efficient_cpu(struct sched_domain *sd,
 	curr_is_rtg = task_in_related_thread_group(cpu_rq(cpu)->curr);
 
 	fbt_env.fastpath = 0;
-	fbt_env.need_idle = need_idle;
+	fbt_env.need_idle = 0;
 
 	if (trace_sched_task_util_enabled())
 		start_t = sched_clock();
@@ -8403,6 +8390,7 @@ static int find_energy_efficient_cpu(struct sched_domain *sd,
 
 		fbt_env.is_rtg = is_rtg;
 		fbt_env.placement_boost = placement_boost;
+		fbt_env.need_idle = need_idle;
 		fbt_env.start_cpu = start_cpu;
 		fbt_env.boosted = boosted;
 		fbt_env.skip_cpu = is_many_wakeup(sibling_count_hint) ?
@@ -8422,7 +8410,7 @@ static int find_energy_efficient_cpu(struct sched_domain *sd,
 		if (p->state == TASK_WAKING)
 			delta = task_util(p);
 #endif
-		if (task_placement_boost_enabled(p) || fbt_env.need_idle || boosted ||
+		if (task_placement_boost_enabled(p) || need_idle || boosted ||
 		    is_rtg || __cpu_overutilized(prev_cpu, delta) ||
 		    !task_fits_max(p, prev_cpu) || cpu_isolated(prev_cpu))
 			goto out;
@@ -8456,7 +8444,7 @@ out:
 		target_cpu = prev_cpu;
 
 	trace_sched_task_util(p, next_cpu, backup_cpu, target_cpu, sync,
-			fbt_env.need_idle, fbt_env.fastpath, placement_boost,
+			need_idle, fbt_env.fastpath, placement_boost,
 			start_t, boosted, is_rtg, get_rtg_status(p),
 			start_cpu);
 	return target_cpu;
@@ -9222,7 +9210,6 @@ struct lb_env {
 	unsigned int		loop;
 	unsigned int		loop_break;
 	unsigned int		loop_max;
-	bool			prefer_spread;
 
 	enum fbq_type		fbq_type;
 	enum group_type		src_grp_type;
@@ -9379,7 +9366,7 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	env->flags &= ~LBF_ALL_PINNED;
 
 	if (energy_aware() && !sd_overutilized(env->sd) &&
-	    env->idle == CPU_NEWLY_IDLE && !env->prefer_spread &&
+	    env->idle == CPU_NEWLY_IDLE &&
 	    !task_in_related_thread_group(p)) {
 		long util_cum_dst, util_cum_src;
 		unsigned long demand;
@@ -9577,13 +9564,8 @@ redo:
 		 * So only when there is other tasks can be balanced or
 		 * there is situation to ignore big task, it is needed
 		 * to skip the task load bigger than 2*imbalance.
-		 *
-		 * And load based checks are skipped for prefer_spread in
-		 * finding busiest group, ignore the task's h_load.
 		 */
-
-		if (!env->prefer_spread &&
-			((cpu_rq(env->src_cpu)->nr_running > 2) ||
+		if (((cpu_rq(env->src_cpu)->nr_running > 2) ||
 			(env->flags & LBF_IGNORE_BIG_TASKS)) &&
 			((load / 2) > env->imbalance))
 			goto next;
@@ -10314,20 +10296,6 @@ static bool update_sd_pick_busiest(struct lb_env *env,
 	if (sgs->group_type < busiest->group_type)
 		return false;
 
-	/*
-	 * This sg and busiest are classified as same. when prefer_spread
-	 * is true, we want to maximize the chance of pulling taks, so
-	 * prefer to pick sg with more runnable tasks and break the ties
-	 * with utilization.
-	 */
-	if (env->prefer_spread) {
-		if (sgs->sum_nr_running < busiest->sum_nr_running)
-			return false;
-		if (sgs->sum_nr_running > busiest->sum_nr_running)
-			return true;
-		return sgs->group_util > busiest->group_util;
-	}
-
 	if (sgs->avg_load <= busiest->avg_load)
 		return false;
 
@@ -10361,7 +10329,6 @@ static bool update_sd_pick_busiest(struct lb_env *env,
 		return false;
 
 asym_packing:
-
 	/* This is the busiest node in its class. */
 	if (!(env->sd->flags & SD_ASYM_PACKING))
 		return true;
@@ -10901,7 +10868,7 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 		int cpu_local, cpu_busiest;
 		unsigned long capacity_local, capacity_busiest;
 
-		if (env->idle != CPU_NEWLY_IDLE && !env->prefer_spread)
+		if (env->idle != CPU_NEWLY_IDLE)
 			goto out_balanced;
 
 		if (!sds.local || !sds.busiest)
@@ -10947,13 +10914,9 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 	/*
 	 * When dst_cpu is idle, prevent SMP nice and/or asymmetric group
 	 * capacities from resulting in underutilization due to avg_load.
-	 *
-	 * When prefer_spread is enabled, force the balance even when
-	 * busiest group has some capacity but loaded with more than 1
-	 * task.
 	 */
 	if (env->idle != CPU_NOT_IDLE && group_has_capacity(env, local) &&
-	    (busiest->group_no_capacity || env->prefer_spread))
+	    busiest->group_no_capacity)
 		goto force_balance;
 
 	/* Misfit tasks should be dealt with regardless of the avg load */
@@ -10999,14 +10962,6 @@ force_balance:
 	/* Looks like there is an imbalance. Compute it */
 	env->src_grp_type = busiest->group_type;
 	calculate_imbalance(env, &sds);
-
-	/*
-	 * If we couldn't find any imbalance, then boost the imbalance
-	 * based on the group util.
-	 */
-	if (!env->imbalance && env->prefer_spread)
-		env->imbalance = (busiest->group_util >> 1);
-
 	trace_sched_load_balance_stats(sds.busiest->cpumask[0], busiest->group_type,
 				busiest->avg_load, busiest->load_per_task,
 				sds.local->cpumask[0], local->group_type,
@@ -11113,7 +11068,7 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 		 * to: wl_i * capacity_j > wl_j * capacity_i;  where j is
 		 * our previous maximum.
 		 */
-		if (wl * busiest_capacity >= busiest_load * capacity) {
+		if (wl * busiest_capacity > busiest_load * capacity) {
 			busiest_load = wl;
 			busiest_capacity = capacity;
 			busiest = rq;
@@ -11283,10 +11238,6 @@ static int load_balance(int this_cpu, struct rq *this_rq,
 		.flags			= 0,
 		.loop			= 0,
 	};
-
-	env.prefer_spread = (idle != CPU_NOT_IDLE &&
-				prefer_spread_on_idle(this_cpu) &&
-				!((sd->flags & SD_ASYM_CPUCAPACITY) ));
 
 	cpumask_and(cpus, sched_domain_span(sd), cpu_active_mask);
 
@@ -11577,8 +11528,7 @@ out:
 				 group ? group->cpumask[0] : 0,
 				 busiest ? busiest->nr_running : 0,
 				 env.imbalance, env.flags, ld_moved,
-				 sd->balance_interval, active_balance,
-				 env.prefer_spread);
+				 sd->balance_interval, active_balance);
 	return ld_moved;
 }
 
@@ -11656,11 +11606,6 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 	int pulled_task = 0;
 	u64 curr_cost = 0;
 	u64 avg_idle = this_rq->avg_idle;
-	bool prefer_spread = prefer_spread_on_idle(this_cpu);
-	bool force_lb = (!is_min_capacity_cpu(this_cpu) &&
-				silver_has_big_tasks() &&
-				sysctl_sched_force_lb_enable &&
-				(atomic_read(&this_rq->nr_iowait) == 0));
 
 	if (cpu_isolated(this_cpu))
 		return 0;
@@ -11677,7 +11622,8 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 	if (!cpu_active(this_cpu))
 		return 0;
 
-	if (force_lb || prefer_spread)
+	if (!is_min_capacity_cpu(this_cpu) && silver_has_big_tasks()
+		&& (atomic_read(&this_rq->nr_iowait) == 0))
 		avg_idle = ULLONG_MAX;
 
 	/*
@@ -11713,10 +11659,6 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 				update_group_capacity(sd, this_cpu);
 			continue;
 		}
-
-		if (prefer_spread && !force_lb &&
-			(sd->flags & SD_ASYM_CPUCAPACITY))
-			avg_idle = this_rq->avg_idle;
 
 		if (avg_idle < curr_cost + sd->max_newidle_lb_cost) {
 			update_next_balance(sd, &next_balance);
@@ -12166,7 +12108,7 @@ static void rebalance_domains(struct rq *rq, enum cpu_idle_type idle)
 		}
 		max_cost += sd->max_newidle_lb_cost;
 
-		if (energy_aware() && !sd_overutilized(sd) && !prefer_spread_on_idle(cpu))
+		if (energy_aware() && !sd_overutilized(sd))
 			continue;
 
 		if (!(sd->flags & SD_LOAD_BALANCE)) {
@@ -12395,11 +12337,12 @@ static inline bool nohz_kick_needed(struct rq *rq, bool only_update)
 	 * is overutilized and has 2 tasks. The misfit task migration
 	 * happens from the tickpath.
 	 */
-	if (likely(energy_aware)) {
-		if (rq->nr_running >= 2 && (cpu_overutilized(cpu) ||
-			prefer_spread_on_idle(cpu)))
-			return true;
-	}
+	if (rq->nr_running >= 2 &&
+	    (!energy_aware() || cpu_overutilized(cpu)))
+		return true;
+
+	if (energy_aware())
+		return false;
 
 	rcu_read_lock();
 	sds = rcu_dereference(per_cpu(sd_llc_shared, cpu));
