@@ -1,13 +1,12 @@
-* Changelog [23rd December 2021]
-* Happy Holidays everyone!
-* Upstreamed latest QuickSilveR source
-* USB-OTG Fixed
-* Upstreamed Wireguard to 202111208
-* Now compiled with LLVM-Polly optimization
-* Added support for NTFS_RW
-* Added support for exFAT-arter97
-* Added experimental support for DriveDroid
-* Removed support for Nintendo Joycons
-* Fixes for better battery backup
-* Addressed a few logspam issues.
-* Other misc optimizations
+* Changelog [4th March 2022]
+* Merge tag 'LA.UM.9.1.r1-11600-SMxxx0.0'
+* Fixed Perfomance regressions
+* Fixed power button camera popup bug
+* Upstreamed F2FS
+* Reduced idle drain from problematic patches
+* Implemented LZO-RLE, ZSTD Compression Algorithms
+* Backported zRAM patches
+* Now uses zSTD as default zRAM compressor
+* Set BBRv2 as default TCP Congestion Algorithm
+* TCP Backports
+* Addressed more logspam
